@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import List
 
 #lc 645 Set Mismatch
@@ -93,3 +94,73 @@ def firstMissingPositive(nums: List[int]) -> int:
     
     # 如果所有位置都被标记（即 [1, n] 都存在），答案是 n+1
     return n + 1
+
+
+# lc1679 Max Number of K-Sum Pairs
+'''
+思路1: 排序 + 左右指针 n log n
+'''
+def maxOperations(nums: List[int], k: int) -> int:
+    max_op = 0
+    nums.sort()
+    left = 0
+    right = len(nums) - 1
+    while left < right:
+        if nums[left] + nums[right] < k:
+            left += 1
+        elif nums[left] + nums[right] > k:
+            right -= 1
+        else:
+            max_op += 1
+            left += 1
+            right -= 1
+
+    print(max_op)
+    return max_op
+
+maxOperations([1,2,3,4],5)
+
+'''
+思路2: 类似 twoSum， num：freq
+'''
+def maxOperations2(nums: List[int], k: int) -> int:
+    checked = defaultdict(int)
+
+    pair_counter = 0
+
+    for idx in range(len(nums)):
+        if k - nums[idx] in checked:
+            pair_counter += 1
+            
+            checked[k - nums[idx]] -= 1
+            if checked[k - nums[idx]] <= 0:
+                del checked[k - nums[idx]]
+
+        else:
+            checked[nums[idx]] += 1
+    
+    print(pair_counter)
+    return pair_counter
+
+maxOperations2([2,2,1,1],3)  
+
+
+
+def findMaxAverage(nums: List[int], k: int) -> float:
+    n = len(nums)
+
+    # 初始状态
+    win = nums[:k]     # 0, k-1
+    win_sum = sum(win)
+    max_sum = win_sum
+
+    left = 0
+    while left+k < n:
+        win_sum -= nums[left]
+        win_sum += nums[left+k]
+        max_sum = max(max_sum, win_sum)
+        left += 1
+    return max_sum/k
+    
+# findMaxAverage([3,3,4,3,0],3)
+findMaxAverage([9,7,3,5,6,2,0,8,1,9],6)
